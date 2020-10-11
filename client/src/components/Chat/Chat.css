@@ -1,0 +1,44 @@
+.main{
+    max-width:100em;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+}
+.chat_area{
+    background-color:#fff;
+}
+.chat_area-view{
+    /* padding:15rem; */
+    width:55em;
+    padding:1rem;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    height:50vh;
+    position:relative;
+}
+
+.chat::after{
+    content:'';
+    width: 100%;
+    height: 100%;
+    z-index:-1;
+    border: 2px solid #000;
+    position: absolute;
+    top:0;
+    left:0;
+    transform:translate(3%,3.5%);
+    background-image:url('./SVG/shadow.svg');
+    background-repeat:repeat;
+    background-size:50%;
+}
+
+
+svg{
+    width:40px;
+    height:40px;
+    transition:all .5s;
+}
+svg .cls-1{
+    fill:transparent;
+}

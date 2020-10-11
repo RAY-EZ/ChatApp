@@ -1,0 +1,41 @@
+.user-left{
+    text-align:left;
+    margin-right:30%;
+}
+.user-right{
+    text-align:right;
+    margin-left:30%;
+} 
+
+.user-left_text,
+.user-right_text{
+    display:block;
+    max-width:100%;
+    font-size:1.3rem;
+    /* border:1px solid #000; */
+    margin-bottom:1rem;
+}
+
+.user-left_text .name{
+    background-color:#000;
+    color:rgba(245, 222, 178, 1);
+    padding:0.2rem;
+    padding-left:1rem;
+    letter-spacing:0.1rem;
+    text-transform:uppercase;
+}
+.user-right_text .name{
+    background-color:rgba(245, 222, 178, 0.8);
+    background-size:40%;
+    color:#000;
+    padding:0.2rem;
+    padding-right:1rem;
+    letter-spacing:0.1rem;
+    text-transform:uppercase;
+}
+.user-right_text .message,
+.user-left_text .message{
+    padding:1rem 1rem;
+    border:1px solid #000;
+    border-top:none;
+}
