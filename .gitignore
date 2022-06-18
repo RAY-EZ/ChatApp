@@ -1,2 +1,5 @@
 node_modules
 .Ds_Store
+
+.turbo
+build

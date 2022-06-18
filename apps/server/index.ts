@@ -1,7 +1,7 @@
-const express = require('express');
-const socketio = require('socket.io');
-const http = require('http');
-const User = require('./users');
+import express from 'express';
+import socketio from 'socket.io';
+import * as http from 'http';
+import * as User from './users';
 
 const PORT = process.env.PORT || 5000;
 
@@ -34,7 +34,7 @@ io.on('connection', (socket)=>{
     });
 
     socket.on('disconnect', ()=>{
-        const user = User.removeUser(socket.id);
+        const user:any = User.removeUser(socket.id);
         if(user){
             io.to(user.room).emit('message', { user:'admin', text:`${user.name} has left.`});
         }
