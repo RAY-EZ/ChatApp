@@ -1,46 +1,40 @@
-import express from 'express';
-import socketio from 'socket.io';
+import express, { NextFunction, Request, Response } from 'express';
+import mongoose from 'mongoose';
 import * as http from 'http';
-import * as User from './users';
+import Socket from './socket'
 
 const PORT = process.env.PORT || 5000;
 
 const router = require('./app');
 
 const app = express();
+app.use((req:Request, res: Response, next: NextFunction)=>{
+  res.setHeader('Access-Control-Request-Method', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  next()
+})
+app.use(express.json());
 const server = http.createServer(app);
-const io = socketio(server);
-
-io.on('connection', (socket)=>{
-    socket.on('join',({name, room}, callback)=>{
-
-        const {error, user} = User.addUser({ id: socket.id, name, room});
-
-        if(error) return callback(error);
-
-        socket.emit('message', { user:'admin', text:`Hi, ${user.name} welcome to the room ${user.room}. We hope to keep healthy conversation Up!.`})
-        socket.broadcast.to(user.room).emit('message', { user:'admin', text:`${user.name} has joined!✌🏻 🎉👋 `})
-        socket.join(user.room);
-
-        callback();
-    });
-    
-    socket.on('sendMessage', (message, callback)=>{
-        // Every Time Front End Emits event We search for Id 
-        const user = User.getUser(socket.id);
-        // Emiting event back to the room in which user exists
-        io.to(user.room).emit('message', {user: user.name, text: message});
-        callback();
-    });
-
-    socket.on('disconnect', ()=>{
-        const user:any = User.removeUser(socket.id);
-        if(user){
-            io.to(user.room).emit('message', { user:'admin', text:`${user.name} has left.`});
-        }
-    })
-});
+Socket(server);
 
 app.use(router);
 
-server.listen(PORT, ()=> console.log(`Server Started Listening on Port ${PORT}`));
+async function start(){
+  try{
+    mongoose.connect('mongodb://localhost:27017/chat_app',(err)=>{
+      if(!err){
+        console.log('\x1b[0m%s\x1b[1;35m%s\x1b[0m','', 'connected to mongodb')
+      }
+    })
+    server.listen(5000, ()=> console.log('\x1b[0m%s\x1b[1;35m%s\x1b[0m','Server Listening on Port ->', 'http://localhost:5000'))
+  }
+  catch(e){
+    console.log('\x1b[0;33m%s\x1b[0m','error starting app')
+    console.log(e);
+
+  }
+}
+
+start();

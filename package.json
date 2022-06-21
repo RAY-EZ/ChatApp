@@ -22,5 +22,8 @@
   "homepage": "https://github.com/RAY-EZ/ChatApp#readme",
   "devDependencies": {
     "turbo": "1.2.16"
+  },
+  "dependencies": {
+    "mongoose": "6.4.0"
   }
 }
