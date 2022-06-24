@@ -2,5 +2,5 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './app'
-
-ReactDOM.render(<App />, document.querySelector('#root'));
+import {DbContext} from './db'
+ReactDOM.render(<DbContext><App /></DbContext>, document.querySelector('#root'));
