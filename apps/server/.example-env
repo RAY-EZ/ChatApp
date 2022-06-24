@@ -1,0 +1,5 @@
+MONGO_URL="mongodb://localhost:27017/"
+DATABASE="chat_app"
+
+JWT_SECRET= "somerandomsecret"
+JWT_EXPIRES_IN=12
