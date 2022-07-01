@@ -15,18 +15,19 @@ const Chat = ({ location }) => {
     const [room, setRoom] = useState('');
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-    const EndPoint = 'localhost:5000';
+    const EndPoint = 'ws://localhost:5000';
 
     useEffect(()=>{
         const {name, room} = queryString.parse(location.search);
 
         socket = io(EndPoint)
+        socket.on('connect', ()=>{ console.log('connect')})
         setName(name);
         setRoom(room);
         // Params : first is the event , second is the data we we want to pass, 
         //third is callback for error handling stuff 
-        socket.emit('join',{name,room}, ()=>{}
-        );
+        // socket.emit('join',{name,room}, ()=>{}
+        // );
         
         return ()=>{
             // Emitting event name should be same on server side 
@@ -36,11 +37,11 @@ const Chat = ({ location }) => {
         }
     }, [EndPoint, location.search]);
 
-    useEffect(()=> {
-        socket.on('message', (message)=>{
-            setMessages([...messages, message]);
-        }, [messages]);
-    });
+    // useEffect(()=> {
+    //     socket.on('message', (message)=>{
+    //         setMessages([...messages, message]);
+    //     }, [messages]);
+    // });
 
     const sendMessage = (event)=>{
         if(message){

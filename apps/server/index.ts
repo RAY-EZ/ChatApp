@@ -1,38 +1,15 @@
-import express, { NextFunction, Request, Response } from 'express';
+import "dotenv/config";
+
 import mongoose from 'mongoose';
 import * as http from 'http';
 import Socket from './socket';
-import cookieParser from 'cookie-parser';
-import "dotenv/config";
+import app from './app';
 
 const PORT = process.env.PORT || 5000;
 
-const router = require('./app');
-
-const app = express();
-
-app.use((req:Request, res: Response, next: NextFunction)=>{
-  res.setHeader('Access-Control-Request-Method', 'POST,GET,PUT,DELETE');
-  res.setHeader('Access-Control-Allow-Headers',req.get('access-control-request-headers') || '*' );
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-  // res.setHeader('Access-Control-Allow-Origin', '*');
-  // console.log(req.get('access-control-request-headers'));
-  if(req.method == 'OPTIONS'){
-    res.statusCode = 200;
-    res.send();
-    return;
-  }
-
-  next();
-})
-app.use(cookieParser());
-
-app.use(express.json());
-const server = http.createServer(app);
+// const server = http.createServer(app);
+const server = http.createServer();
 Socket(server);
-
-app.use(router);
 
 async function start(){
   try{

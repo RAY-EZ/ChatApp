@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 
-interface userAttrs {
+export interface userAttrs {
   username: string;
   password: string;
 }

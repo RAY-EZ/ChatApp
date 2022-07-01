@@ -11,7 +11,7 @@ router.post(
     .trim()
     .toLowerCase()
     .isLength({max:10})
-    .matches(/^(?=.{4,10}$)[a-z][a-z0-9_]*/)
+    .matches(/^(?=[a-z0-9_]{4,10}$)[a-z][a-z0-9_]*/)
     .withMessage("invalid username")
     ,
   body('password')
@@ -21,8 +21,11 @@ router.post(
     .isLength({min:2 ,max:20})    // update min value
     .withMessage("password length should be between 8 and 20"), 
     
-  authController.login);
+  authController.login
+);
 
-router.post('/logout', authController.logout);
+router.post('/logout', 
+  authController.logout
+  );
 
 export default router;

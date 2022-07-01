@@ -51,7 +51,6 @@ export async function isLoggedIn(req: Request, res: Response, next: NextFunction
   res.locals = {
     currentUser: user
   }
-
   //this doesn't 
   // res.locals.currentUser = user;
   next();
@@ -105,6 +104,6 @@ export async function logout(req: Request, res: Response, next: NextFunction){
   
   res.statusCode = 200;
   res.clearCookie('jwt')
-  res.send("success");
+  res.send({});
 }
 

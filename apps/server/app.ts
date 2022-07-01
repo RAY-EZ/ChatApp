@@ -1,23 +1,46 @@
 import express, {NextFunction, Request, Response} from 'express';
+import cookieParser from 'cookie-parser'
+
 import UserRouter from './routes/userRouter';
 import AuthRouter from './routes/authRouter';
+import GroupRouter from './routes/groupRouter';
 import AppError from './utilities/appError';
 
-const router = express.Router();
+const app = express();
 
-router.get('/', (req, res)=>{
+app.use((req:Request, res: Response, next: NextFunction)=>{
+  res.setHeader('Access-Control-Request-Method', 'POST,GET,PUT,DELETE');
+  res.setHeader('Access-Control-Allow-Headers',req.get('access-control-request-headers') || '*' );
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  // res.setHeader('Access-Control-Allow-Origin', '*');
+  // console.log(req.get('access-control-request-headers'));
+  if(req.method == 'OPTIONS'){
+    res.statusCode = 200;
+    res.send();
+    return;
+  }
+
+  next();
+})
+app.use(cookieParser());
+
+app.use(express.json());
+
+app.get('/', (req, res)=>{
     res.send('server is up and running');
 })
 
-router.use('/user', UserRouter );
-router.use('/auth', AuthRouter);
+app.use('/user', UserRouter );
+app.use('/auth', AuthRouter);
+app.use('/group', GroupRouter);
 
-router.use('*', (req:Request, res: Response)=>{
+app.use('*', (req:Request, res: Response)=>{
   res.statusCode = 404;
   res.send('<h1>not found<h1>')
 })
 
-router.use((error: AppError, req: Request, res: Response, next: NextFunction)=>{
+app.use((error: AppError, req: Request, res: Response, next: NextFunction)=>{
   console.log("Error handler middleware", error.message)
   res.statusCode = error.statusCode;
   res.send({
@@ -25,4 +48,5 @@ router.use((error: AppError, req: Request, res: Response, next: NextFunction)=>{
     message: error.message
   })
 })
-module.exports = router;
+
+export default app;

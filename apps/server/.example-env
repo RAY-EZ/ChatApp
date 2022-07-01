@@ -3,3 +3,4 @@ DATABASE="chat_app"
 
 JWT_SECRET= "somerandomsecret"
 JWT_EXPIRES_IN=12
+
