@@ -1,6 +1,6 @@
-import React from 'react';
-
-import { BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import io from 'socket.io-client';
+import { BrowserRouter as Router,Routes, Route, Link} from 'react-router-dom';
 
 import Join from './components/Join/Join';
 import Chat from './components/Chat/Chat';
@@ -10,11 +10,30 @@ import './styles/index.scss'
 
 const App = () =>{
   const {user} = useUserContext();
+  const socket = useRef();
+  const host = window.location.hostname;
+  const EndPoint = `ws://${host}:5000`;
+  
+  useEffect(()=>{
+    console.log('component mounted')
+    socket.current = io(EndPoint,{
+      transports: ['websocket'],
+    })
+
+    return ()=>{
+      console.log('component unmounted')
+      socket.disconnect();
+      socket.off();
+    }
+  },[])
+
  return( 
   <div className="container">
     <Router>
-      <Route path="/" exact component={user === null ? Join : Home}/>
-      <Route path="/chat" exact component={Chat}/>
+      <Routes>
+        <Route path="/" exact element={user === null ? <Join/> : <Home/>}/>
+        <Route path="/chat" exact element={<Chat socket={socket.current}/>}/>
+      </Routes>
     </Router>
   <div className="footer">
     {/* <p>Made By Sushil & Pankaj Dadwal</p> */}

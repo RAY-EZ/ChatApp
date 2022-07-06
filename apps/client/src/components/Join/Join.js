@@ -34,7 +34,6 @@ const Join = () => {
       
       try{
         const response = await axios.post(`http://localhost:5000${uri}`,{
-            name,
             password,
             username: name
         },{
@@ -50,6 +49,7 @@ const Join = () => {
         // window.localStorage.setItem('user', response.data.user);
         setUser(response.data.user);
       }catch(e){
+        // console.log(e)
         console.log(e.response.data.message)
         messageRef.innerHTML = e.response.data.message;
       }
