@@ -72,12 +72,12 @@ export async function login(req: Request, res: Response, next: NextFunction){
   const user = await User.findOne({ username});
   
   if(!user) return next(new AppError('Incorrect username or password', 401));
-
+  
   const storedPassword = user.password;
   const token = signToken(user.id);
-
+  
   const arePasswordsSame = await comparePassword(storedPassword,password);
-
+  
   user.password = undefined;
   if(arePasswordsSame){
     res.cookie('jwt', token, { expires: new Date(Date.now() + JWT_COOKIE_EXPIRES), httpOnly: true});
@@ -86,11 +86,10 @@ export async function login(req: Request, res: Response, next: NextFunction){
     res.send({
       user
     });
-
+    
     console.log('login successful')
   } else {
-    res.statusCode = 401;
-    res.send("failed")
+    return next(new AppError('Incorrect username or password', 401));
   }
 }
 
@@ -107,3 +106,13 @@ export async function logout(req: Request, res: Response, next: NextFunction){
   res.send({});
 }
 
+export function isValidJWT(token: string){
+  
+  const payload:payload = jwt.verify(token, process.env.JWT_SECRET) as payload;
+
+  if(!mongoose.isValidObjectId(payload.id)){
+    return {} as payload;
+  }
+
+  return payload;
+}

@@ -2,12 +2,54 @@ import express, {Request, Response, NextFunction } from 'express';
 import {body, validationResult, param} from 'express-validator';
 import { userAttrs } from '../models/users';
 import mongoose from 'mongoose';
-import Group, { memberLevel} from '../models/groups';
-
+import Group, { memberLevel, groupAttr} from '../models/groups';
+import Query from '../utilities/query'
 import { isLoggedIn } from '../controller/authController';
 import AppError from '../utilities/appError';
 
 const Router = express.Router();
+
+Router.get('/', isLoggedIn, async (req: Request, res: Response, next: NextFunction)=>{
+  // Return groups user belong to then unknown groups -- general search
+  // return cursor to next page -- skipping and limiting ...
+  // console.log(res.locals.currentUser.id)
+  // console.log(req.query)
+  const groupQuery = Group.find();
+  const group = await new Query<mongoose.HydratedDocument<groupAttr>>(groupQuery,req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate()
+    .query;
+  // console.log(group)
+  res.send(group)
+})
+
+Router.get('/active', async (req: Request, res: Response, next: NextFunction)=>{
+  
+})
+
+Router.get('/:groupid', async (req: Request, res: Response, next: NextFunction)=>{
+  const groupId = req.params.groupid as string;
+
+  if(!mongoose.isValidObjectId(groupId)){
+    return next(new AppError('invalid id', 400))
+  }
+  const group = await Group.findById(groupId).populate({path: 'members.user'})
+
+  // console.log(group);
+  if(!group){
+    return next(new AppError('not found', 404));
+  }
+  res.statusCode = 200;
+  res.json({
+    length: 1,
+    data: [
+      group
+    ]
+  })
+})
+
 
 Router.post('/create', isLoggedIn, async (req: Request, res: Response, next:NextFunction)=>{
   const {name, isProtected} = req.body as {  name: string; isProtected: boolean; password?: string; }
@@ -34,28 +76,6 @@ Router.post('/create', isLoggedIn, async (req: Request, res: Response, next:Next
     res.send(e.message)
   }
 
-})
-
-
-Router.get('/:groupid', async (req: Request, res: Response, next: NextFunction)=>{
-    const groupId = req.params.groupid as string;
-
-    if(!mongoose.isValidObjectId(groupId)){
-      return next(new AppError('invalid id', 400))
-    }
-    const group = await Group.findById(groupId)
-
-    // console.log(group);
-    if(!group){
-      return next(new AppError('not found', 404));
-    }
-    res.statusCode = 200;
-    res.json({
-      length: 1,
-      data: [
-        group
-      ]
-    })
 })
 
 Router.post('/:groupid/add/:userid', async (req: Request, res: Response, next: NextFunction)=>{

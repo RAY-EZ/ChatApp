@@ -120,6 +120,9 @@ describe('handling members in group', ()=>{
 })
 
 describe('querying group', ()=>{
+  it('gets group with matching name and id', ()=>{
+    
+  })
   it.todo('returns member having specific permission level')
   it.todo('member belongs to a given group')
   it.todo('filters protected groups')

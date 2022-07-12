@@ -1,4 +1,4 @@
-import mongoose, { SchemaType, HydratedDocument, Types, mongo } from 'mongoose';
+import mongoose, { SchemaType, HydratedDocument, Types, mongo, Query } from 'mongoose';
 import crypto from 'crypto';
 import base from 'base-x'
 import { userAttrs } from './users';
@@ -6,17 +6,17 @@ import { userAttrs } from './users';
  * Permission Level
  * Promote   Add      Read/Write       
  * /Remove
- *  4         2          1         -- Admin
- *  0         2          1         -- Co-admin
+ *  1         1          1         -- Admin
+ *  0         1          1         -- Co-admin
  *  0         0          1         -- member     
  */
 export enum memberLevel {
-  admin = '421',
-  coAdmin = '021',
-  member = '001'
+  admin= "ADMIN",
+  coadmin = "COADMIN",
+  member = "MEMBER"
 }
 
-interface groupAttr {
+export interface groupAttr {
   name: string;
   isProtected: boolean;
   password?: string;
@@ -29,8 +29,12 @@ interface groupMethods {
   RemoveMemberById(userid: mongoose.Types.ObjectId | string):Promise<HydratedDocument<groupAttr>>;
 }
 
+type HydratedGroupDoc = HydratedDocument<groupAttr>;
+
 interface groupModel extends mongoose.Model<groupAttr, {} ,groupMethods> {
   build(attrs: groupAttr): mongoose.HydratedDocument<groupAttr>;
+  isMemberInGroup(groupid: mongoose.ObjectId | string,userid: mongoose.ObjectId | string): Promise<Boolean>;
+  // getAll(): mongoose.Aggregate<any>
 }
 
 
@@ -51,7 +55,8 @@ const groupSchema= new mongoose.Schema<groupAttr, groupModel, groupMethods>({
     }, "required password"],
   },
   g_id: {
-    type: String
+    type: String,
+    immutable: true
   },
   members: [
     {
@@ -62,7 +67,8 @@ const groupSchema= new mongoose.Schema<groupAttr, groupModel, groupMethods>({
       level: {
         type: String,
         enum: memberLevel,
-        default: memberLevel.member
+        default: memberLevel.member,
+        // get: levelGetter
       },
       _id: false
     }
@@ -74,17 +80,30 @@ const groupSchema= new mongoose.Schema<groupAttr, groupModel, groupMethods>({
       ret.id = ret._id;
       ret._id = undefined;
       ret.__v = undefined;
+      ret.updated_at= undefined;
     },
-    virtuals: true
+    virtuals: true,
+    getters: true
+  },
+  toObject: {
+    getters: true
   },
   timestamps: {
     createdAt: "created_at",
     updatedAt: "updated_at"
-  }
+  },
+  strictQuery: false
 })
-
-// console.log(groupSchema.paths);
-
+groupSchema.virtual('total_members').get(function(){
+  return this.members.length;
+})
+groupSchema.post(/(find|findOne)/,function(doc){
+  // console.log('post find middleware')
+  // console.log(doc);
+  // dropped the idea of modifying document here
+})
+// groupSchema.path('members').get(memberGetter)
+// console.log(groupSchema.path('members'))
 groupSchema.methods.AddMemberById = function(this:HydratedDocument<groupAttr>, userid: mongoose.Types.ObjectId | string){
   this.members = [
     ...this.members,
@@ -141,6 +160,13 @@ groupSchema.statics.getGroupsByMemberId = function(userid: mongoose.Types.Object
 
 groupSchema.statics.build = function(attrs: groupAttr){
   return new Group(attrs);
+}
+
+groupSchema.statics.isMemberInGroup = async function(groupid:mongoose.ObjectId | string ,userid: mongoose.ObjectId | string){
+  let result = await Group.findOne({ _id: groupid, 'members.user': userid})
+
+  // console.log(result);
+  return result? true: false;
 }
 /* Hook to hash password before saving */
 groupSchema.pre('save',async function(next){

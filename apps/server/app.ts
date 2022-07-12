@@ -33,7 +33,7 @@ app.get('/', (req, res)=>{
 
 app.use('/user', UserRouter );
 app.use('/auth', AuthRouter);
-app.use('/group', GroupRouter);
+app.use('/group', GroupRouter);;
 
 app.use('*', (req:Request, res: Response)=>{
   res.statusCode = 404;
