@@ -65,19 +65,15 @@ canvas{
   left: 50%;
   transform: translate(-50%, -50%);
 
-  // & h2 {
-  //   @extend %title-80;
-  //   color: inherit;
-  //   white-space:nowrap;
+}
 
-  // }
-  // & a {
-  //   @extend %title-40;
-  //   color: inherit;
-
-  //   &:active {
-  //     color: #ddd;
-  //   }
-  // }
+.btn {
   
+  &:hover{
+    transform: translate(2%, 2%);
+  }
+  &:hover:active{
+    color: $secondary-color;
+    background-color: $active-color;
+  }
 }

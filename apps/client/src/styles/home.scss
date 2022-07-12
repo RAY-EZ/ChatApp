@@ -1,0 +1,216 @@
+.home {
+  &-container {
+    overflow: scroll;
+    // background-color:rebeccapurple;
+    margin: 0rem auto;
+    max-width: 120rem;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 7rem;
+  }
+  
+  &__title{
+    
+    // flex-grow: 0.3;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10rem;
+    width: 100%;
+    text-transform: capitalize;
+    border-bottom: 0.1rem solid $tertiory-color;
+
+    &__greet{
+
+      font-size: 4rem;
+      font-weight:300;
+    }
+  }
+
+  &__group-search {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: center;
+
+    &__input{
+      border: 0.1rem solid $secondary-color;
+      background-color: transparent;
+      outline: none;
+      font-size: 1.6rem;
+      padding: 1rem 2rem;
+      height: 5rem;
+      &[name="group"]{
+        width: 35rem;
+      }
+      &[name="tag"]{
+        width: 15rem;
+        &::placeholder{
+          text-transform: capitalize;
+        }
+        text-transform: uppercase;
+      }
+    }
+    &__find{
+
+    }
+
+    &__find{
+      border: none;
+      margin-left: 2rem;
+      padding: 1rem 3rem;
+      background-color: $secondary-color;
+      color: $primary_color;
+      font-size: 1.4rem;
+      font-weight: 100;
+      letter-spacing: 0.1rem;
+      cursor: pointer;
+    }
+  }
+
+  &__group-list{
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,30rem);
+    justify-content: center;
+    // grid-template-rows: repeat(3, 40rem);
+    // grid-auto-rows: max-content;
+
+    gap: 2rem;
+  }
+
+  &__initial-message{
+    height: 30rem;
+    font-size: 2.6rem;
+    font-weight: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column: 1/-1;
+  }
+  &__logout{
+    align-self: center;
+    padding:1.5rem 3rem;
+  }
+  
+}
+
+.btn--clear {
+  border: none;
+  background-color: transparent;
+  border: 0.1rem solid $secondary-color;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.group__card{
+  position: relative;
+  display: flex;
+  // width: 40rem;
+  flex-direction: column;
+  height: 20rem;
+  // background-color: orangered;
+  border: 0.1rem solid $secondary-color;
+  justify-content: space-between;
+  
+  &__info{
+    background-color: $primary_color;
+    height: 50%;
+    user-select: text;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 2rem;
+    align-items: center;
+  }
+  
+  &__tag{
+    color: $tertiory-color;
+    font-weight: 200;
+    font-size: 1.6rem;
+  }
+  &__status{
+    padding: 2rem;
+    background-color: $secondary-color;
+    color: $primary_color;
+    height: 50%;
+    display: flex;
+    font-size: 1.4rem;
+    font-weight: 100;
+    justify-content: space-around;
+    align-items: center;
+    
+    &__online,
+    &__members{
+      text-align: center;
+      padding: 1rem;
+      & :first-child{
+        box-sizing: unset;
+        padding: 0 0.5rem;
+        margin-bottom: 0.2rem;
+        border-bottom:0.1rem solid $primary_color;
+      }
+    }
+
+  }
+
+  &::before{
+    content: '';
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    border: 2px solid #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url('../components/Home/SVG/shadow.svg');
+    background-repeat: repeat;
+    background-size: 40%;
+  }
+
+  &:hover::before {
+    transform: translate(3%, 4%);
+  }
+  // &:focus{
+  //   transform: translate(-5%, -5%);
+  //   background-color: red;
+  // }
+  &:active{
+    transform: translate(2%, 2%);
+  }
+  &:active &__info {
+    background-color:#e5be71;
+  }
+  &:hover:active,
+  &:focus:active{
+    transform: translate(1.5%, 2%);
+    
+    &::before{
+      transform: translate(1.5%, 2%);
+      
+    }
+  }
+  &:hover {
+    transform: translate(-2%, -2%);
+  }
+}
+
+.hash {
+  background-color: $secondary-color;
+  color: $primary_color;
+  font-size: 2.2rem;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}

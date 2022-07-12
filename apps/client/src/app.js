@@ -22,8 +22,8 @@ const App = () =>{
 
     return ()=>{
       console.log('component unmounted')
-      socket.disconnect();
-      socket.off();
+      socket.current.disconnect();
+      socket.current.off();
     }
   },[])
 
@@ -31,7 +31,7 @@ const App = () =>{
   <div className="container">
     <Router>
       <Routes>
-        <Route path="/" exact element={user === null ? <Join/> : <Home/>}/>
+        <Route path="/" exact element={user === null ? <Join/> : <Home socket={socket.current}/>}/>
         <Route path="/chat" exact element={<Chat socket={socket.current}/>}/>
       </Routes>
     </Router>

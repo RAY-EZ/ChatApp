@@ -12,13 +12,13 @@ body {
   font-family: sans-serif;
 }
 
-.container {
+/* .container {
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
   position: relative;
   background-color: rgba(245, 222, 178, 0.8);
-}
+} */
 
 .fake-wrapper {
   /* width: 25em; */
@@ -138,7 +138,7 @@ input.btn {
   background-color: rgba(241, 200, 122, 0.8);
 }
 
-.footer {
+/* .footer {
   position: absolute;
   padding: 1rem;
   bottom: 0;
@@ -150,4 +150,4 @@ input.btn {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.2rem;
-}
+} */
