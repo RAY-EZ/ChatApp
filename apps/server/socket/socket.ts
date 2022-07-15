@@ -5,6 +5,7 @@ import socketio from 'socket.io';
 import User from '../models/users';
 import Group from '../models/groups';
 import Redis  from '../redis';
+import {nanoid} from 'nanoid';
 
 import { isValidJWT } from '../controller/authController';
 
@@ -36,8 +37,8 @@ export default async (server: http.Server)=>{
 
     // verify user 
     if(!payload.id) return socket.disconnect(true);
+
     const user = await User.findById(payload.id); 
-    
       socket.on('join',async (group)=>{
         // verify user is in group and group exists
         if(!mongoose.isValidObjectId(group.id)) return socket.emit('join:error',{
@@ -52,7 +53,10 @@ export default async (server: http.Server)=>{
         });
 
         // compare password with group password
-
+        console.log(group.id)
+        
+        // add user to a room
+        socket.join(group.id);
         // add user to group in redis
         console.log(user.id);
         await Redis.instance.SADD(group.id,`${user.id}`)
@@ -60,13 +64,36 @@ export default async (server: http.Server)=>{
         await Redis.instance.SET(user.id, group.id);
         
         // change user activity from idle to group info
-
-        console.log('\x1b[0;32m%s\x1b[0m',`${user.username} has joined ${group.name}`)
-        socket.emit('welcome', "welcome to chat app")
-
         
-      });
+        console.log('\x1b[0;32m%s\x1b[0m',`${user.username} has joined ${group.name}`)
+        socket.to(group.id).emit('user:join', {
+          userId: user.id,
+          userName: user.username
+        })    
+        
+        const groupData = await Redis.instance.SMEMBERS(group.id);
+        socket.to(group.id).emit('active:update',{
+          members: groupData,
+          groupId: group.id,
+          activeCount: groupData.length
+        })
 
+        /* Fix This Later */
+        io.emit('active:update',{
+          members: groupData,
+          groupId: group.id,
+          activeCount: groupData.length
+        })
+        // io.emit('welcome', "welcom to chat app");
+        // setTimeout(()=>{
+        //   socket.emit('newjoin', {
+        //     groupId: group.id
+        //   })
+        // }, 3000)
+        socket.emit('welcome', "welcome to chat app");
+        // socket.to(socket.id).emit('welcome', "welcom to chat app")
+      });
+      
       socket.on('leave', async ()=>{
         // verfiy user is active in group
         const userGroup = await Redis.instance.GET(user.id);
@@ -74,26 +101,49 @@ export default async (server: http.Server)=>{
         await Redis.instance.SISMEMBER(userGroup, user.id);
         await Redis.instance.SREM(userGroup, user.id);
         //broadcast user left event in group
-        // socket.emit('user:left',{ userId: user.id, userName: user.username});
+        socket.to(userGroup).emit('user:left',{ userId: user.id, userName: user.username});
 
+        socket.leave(userGroup);
         // change user activity to idle
         await Redis.instance.SET(user.id, 'idle');
+
+        const groupData = await Redis.instance.SMEMBERS(userGroup); // groupid fetched from redis
+        socket.to(userGroup).emit('active:update',{
+          members: groupData,
+          groupId: userGroup,
+          activeCount: groupData.length
+        })
+        io.emit('active:update',{
+          members: groupData,
+          groupId: userGroup,
+          activeCount: groupData.length
+        })
 
         console.log('\x1b[0;31m%s\x1b[0m',`${user.username} left`);
       })
 
-      socket.on('sendMessage', (message, callback)=>{
-        // check user is group list in redis
-        // check group matches user activity's group
-        // broadcast message in group
+      socket.on('sendMessage', async ({message})=>{
+        // get current group user has joined 
+        const userGroup = await Redis.instance.GET(user.id);
+        // broadcast message to group
+        let stamp = new Date().toUTCString();
+        let msgid = nanoid()
+        socket.to(userGroup).emit('message', {
+          message,
+          msgid,
+          stamp,
+          sender: {
+            userId: user.id,
+            userName: user.username
+          }
+        })
 
-        // Every Time Front End Emits event We search for Id 
-        // const user = User.getUser(socket.id);
-        // // Emiting event back to the room in which user exists
-        // io.to(user.room).emit('message', {user: user.name, text: message});
-        // callback();
-
-        console.log(message)
+        socket.emit('message:ack', {
+          msgid,
+          stamp: stamp,
+          message
+        })
+        console.log('\x1b[47m\x1b[0;35m%s\x1b[0m', `message by ${user.username}`);
       });
 
       socket.on('disconnect', ()=>{

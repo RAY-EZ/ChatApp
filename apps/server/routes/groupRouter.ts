@@ -6,10 +6,10 @@ import Group, { memberLevel, groupAttr} from '../models/groups';
 import Query from '../utilities/query'
 import { isLoggedIn } from '../controller/authController';
 import AppError from '../utilities/appError';
-
+import Redis from '../redis'
 const Router = express.Router();
 
-Router.get('/', isLoggedIn, async (req: Request, res: Response, next: NextFunction)=>{
+Router.get('/search', isLoggedIn, async (req: Request, res: Response, next: NextFunction)=>{
   // Return groups user belong to then unknown groups -- general search
   // return cursor to next page -- skipping and limiting ...
   // console.log(res.locals.currentUser.id)
@@ -25,8 +25,17 @@ Router.get('/', isLoggedIn, async (req: Request, res: Response, next: NextFuncti
   res.send(group)
 })
 
-Router.get('/active', async (req: Request, res: Response, next: NextFunction)=>{
-  
+Router.get('/', isLoggedIn,async (req: Request, res: Response, next: NextFunction)=>{
+  const { id } = res.locals.currentUser
+
+  const groups = await Group.find({"members.user": id}).populate({ path: 'members.user'});
+
+  res.send({
+    length: groups.length,
+    data:[
+      ...groups
+    ]
+  })
 })
 
 Router.get('/:groupid', async (req: Request, res: Response, next: NextFunction)=>{
@@ -50,6 +59,14 @@ Router.get('/:groupid', async (req: Request, res: Response, next: NextFunction)=
   })
 })
 
+Router.get('/:groupid/active', isLoggedIn,async (req: Request, res: Response, next: NextFunction)=>{
+  
+  const activeCount = await Redis.instance.SCARD(req.params.groupid)
+  res.send({
+    activeCount,
+    groupid: req.params.groupid
+  })
+})
 
 Router.post('/create', isLoggedIn, async (req: Request, res: Response, next:NextFunction)=>{
   const {name, isProtected} = req.body as {  name: string; isProtected: boolean; password?: string; }
