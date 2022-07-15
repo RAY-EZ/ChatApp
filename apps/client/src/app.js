@@ -1,38 +1,52 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import { BrowserRouter as Router,Routes, Route, Link} from 'react-router-dom';
+import { BrowserRouter as Router,Routes, Route, Link, useParams} from 'react-router-dom';
 
 import Join from './components/Join/Join';
 import Chat from './components/Chat/Chat';
 import Home from './components/Home';
+import NoMatch from './components/NoMatch';
 import { useUserContext } from './db';
 import './styles/index.scss'
 
 const App = () =>{
   const {user} = useUserContext();
-  const socket = useRef();
+  const [Socket, setSocket] = useState(null)
   const host = window.location.hostname;
   const EndPoint = `ws://${host}:5000`;
-  
+
   useEffect(()=>{
     console.log('component mounted')
-    socket.current = io(EndPoint,{
+    let socket= io(EndPoint,{
       transports: ['websocket'],
+      autoConnect: false
     })
-
+    socket.connect();
+    socket.on('connect',()=>{
+      console.log('\x1b[1;32m%s\x1b[0m', 'connected');
+    })
+    setSocket(socket);
+    console.log('1st')
     return ()=>{
       console.log('component unmounted')
-      socket.current.disconnect();
-      socket.current.off();
+      socket.disconnect();
+      socket.off();
     }
   },[])
+
+  if(!Socket){
+    return (
+      <h1>Connecting to server</h1>
+    )
+  }
 
  return( 
   <div className="container">
     <Router>
       <Routes>
-        <Route path="/" exact element={user === null ? <Join/> : <Home socket={socket.current}/>}/>
-        <Route path="/chat" exact element={<Chat socket={socket.current}/>}/>
+        <Route path="/" exact element={user === null ? <Join/> : <Home socket={Socket}/>}/>
+        <Route path="/chat/:groupid" exact element={<Chat socket={Socket}/>}/>
+        <Route path="*" element={<NoMatch/>}/>
       </Routes>
     </Router>
   <div className="footer">

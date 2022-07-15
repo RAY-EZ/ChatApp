@@ -73,6 +73,7 @@
     border-top: none;
 
     &__view{
+      overflow-y: scroll;
       width: 100%;
       height: 40rem;
       flex-grow: 1;

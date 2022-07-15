@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function GroupCard({groups}){
-  const online = 2;
+  const online = 0;
   const members = 10;
 
   return (

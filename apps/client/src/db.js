@@ -37,16 +37,27 @@ export const DbContext = ({children})=>{
 
   useEffect(()=>{
     (async ()=>{
-      const db = await idb.openDB('chat_app', 1, (db)=>{
-        db.createObjectStore('groups', {keyPath: 'g_id'})
+      const db = await idb.openDB('chat_app',1,{
+        upgrade(db){
+          db.createObjectStore('groups', {keyPath: 'id'})
+          db.createObjectStore('chat', {keyPath: 'msgid'})
+        }
       })
+      // console.log(db)
       setdb(db);
     })()
   },[])
 
+  if(db === null){
+    return(
+      <h1>Connecting to db</h1>
+    )
+  }
+
   return (
     <dbContext.Provider value={db}>
       <userContext.Provider value={userContextVal}>
+        
         {children}
       </userContext.Provider>
     </dbContext.Provider>

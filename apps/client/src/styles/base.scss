@@ -64,7 +64,22 @@ canvas{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  text-align: center;
+  &__message{
+    font-size: 5rem;
+    font-weight: 300;
+  }
 
+  &__button{
+    margin-top: 2rem;
+    display: inline-block;
+    padding: 1rem 3rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 1.2rem;
+    background-color: $secondary-color;
+    color: $primary-color;
+  }
 }
 
 .btn {
