@@ -1,3 +1,5 @@
+<img src="https://github.com/RAY-EZ/ChatApp/blob/master/sample_image/thumbnail.svg" width="100" align="right">
+
 ## Real Time Chat Application 
 
 Using Node, Socket.io, and React
