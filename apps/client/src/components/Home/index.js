@@ -1,43 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { useUserContext } from '../../db';
+import { useDbContext, useUserContext } from '../../db';
 import GroupCard from './groupCard';
 import axios from 'axios';
-import { useDbContext } from '../../db';
-import createUrl from '../../utils/createUrl';
 
-async function getAllGroups(db){
-  let tx = db.transaction('groups', 'readonly');
-  let groupStore = tx.objectStore('groups')
+import GroupList from './groupList';
 
-  const groups = await groupStore.getAll();
-  return groups;
-} 
-/**
- * 
- * @param {object} db  - indexed db instance
- * @param {array} groupList - array of group object
- */
-async function pushGroupIntoDB(db, groupList){
-  let tx = db.transaction('groups', 'readwrite');
+function clearDb(db){
+  const tx = db.transaction('groups', 'readwrite');
   let groupStore = tx.objectStore('groups');
 
-  for(let i=0; i< groupList.length; i++){
-    const groups = await groupStore.add(groupList[i]);
-  }
-}
-
-/**
- * 
- * @param {string} groupid - unique group identifier
- * @param {number} active - active members
- * @param {number} members - total members
- */
-function updateGroupStatus(groupid, active, members ){
-  const activeElement = document.querySelector(`[data-group-id="${groupid}"] .group__card__status__online`);
-  /** Fix it later */
-  if(!activeElement) return;
-  activeElement.innerHTML = `<p>Online</p><p>${active}</p>`
+  groupStore.clear();
 }
 
 export default function Home({ socket:Socket }){
@@ -48,47 +21,10 @@ export default function Home({ socket:Socket }){
   const [searchedGroup, setSearchedGroup] = useState([]);
   const [groupid, setGroupid] = useState('');
   const [searchMode, toggleSearch] = useState(false)
-  const [groupList, updateGroupList] = useState([]);
 
-  // console.log('rerender');
-  useEffect(()=>{
-    /** Quick Fix Solve it later using Context */
-    // console.log(Socket);
-    // console.log(db);
-    (async ()=>{
-      try {
-        let groups = await getAllGroups(db);
-        if(groups.length === 0){
-          let url = createUrl('/group/');
-          const response = await axios.get(url.href,{
-            withCredentials: true
-          })
-          groups = response.data.data
-          await pushGroupIntoDB(db, groups); 
-        }
-        updateGroupList(groups)
-      } catch(e){
-        console.log(e)
-      }
-    })()
-    
-    // return ()=> console.log('home unmounted')
-    // setHotfix(true);
-  },[])
-
-  useEffect(()=>{
-    function activeUpdate(data){
-      updateGroupStatus(data.groupId, data.activeCount, 10)
-    }
-    Socket.on('active:update',activeUpdate)
-    // Socket.on('shit', (shit)=>{
-    //   console.log(shit);
-    // })
-    // console.log(Socket)
-    return ()=>{
-      Socket.off('active:update', activeUpdate);
-    }
-  },[])
+  if(Socket.disconnected) {
+    Socket.connect();
+  }
   
   function handleFocus(e){
     if(e.type === 'focus') toggleSearch(true);
@@ -104,13 +40,7 @@ export default function Home({ socket:Socket }){
       setMethod(e.target.value);
     }
   }
-  const IntialMessage = ()=>{
-    return (
-      <h2 className="home__initial-message">
-        Join a group to start chatting ♥
-      </h2>
-    )
-  }
+
   async function handleSearch(e){
     e.preventDefault();
       const url = new URL(`http://${window.location.hostname}:5000`);
@@ -131,20 +61,6 @@ export default function Home({ socket:Socket }){
       }
   }
 
-  function handleJoin(event){
-    const Group = event.target.closest('.group__card');
-    if(!Group) return; // null - no group selected
-    const GroupId = Group.dataset.groupId;
-    if(!GroupId) return; // undefined
-    const Groupinfo = {
-      name: Group.dataset.groupName,
-      id: Group.dataset.groupId,
-      g_id: Group.dataset.g_id
-    }
-    Socket.emit('join', Groupinfo );
-    setGroupid(Groupinfo.id);
-    
-  }
 
   async function handleLogout(){
     const route = `/auth`
@@ -152,9 +68,11 @@ export default function Home({ socket:Socket }){
     try {
       await axios.post(`${window.location.protocol}//${window.location.hostname}:5000${route}/logout`,{},{withCredentials:true});
       setUser('')
+      clearDb(db);
       window.location.reload();
     } catch(e){
-      console.log(e.response.data.message)
+      console.log(e)
+      // console.log(e.response.data.message)
     }
   }
   return (
@@ -173,14 +91,7 @@ export default function Home({ socket:Socket }){
         <input type="text" className="home__group-search__input" name="tag" placeholder="Tag" maxLength={5} onChange={updateState(setTag)} onBlur={handleFocus}/>
         <button className="btn home__group-search__find" onClick={handleSearch}>Find</button>
       </div>
-      <div className="home__group-list" onClick={handleJoin}>
-        {(groupList.length === 0 && searchedGroup.length ===0) && <IntialMessage/>}
-        <GroupCard groups={
-          (searchedGroup.length > 0 && searchMode) ? 
-          searchedGroup: groupList
-          }/> 
-  
-      </div>
+      <GroupList Socket={Socket} setGroupid={setGroupid} searchMode={searchMode} searchedGroup={searchedGroup}/>
     </div>
   )
 }

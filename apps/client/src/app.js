@@ -21,7 +21,7 @@ const App = () =>{
       transports: ['websocket'],
       autoConnect: false
     })
-    socket.connect();
+    // socket.connect();
     socket.on('connect',()=>{
       console.log('\x1b[1;32m%s\x1b[0m', 'connected');
     })

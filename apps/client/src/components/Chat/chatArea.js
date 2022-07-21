@@ -8,7 +8,8 @@ import Input from './input';
 
 // approach 2 for now
 function appendMessage({message, sender},to){
-  document.querySelector('.chat__area__view').insertAdjacentHTML('beforeend',
+  let chatArea = document.querySelector('.chat__area__view')
+  chatArea.insertAdjacentHTML('beforeend',
    `<div class="chat__area__message message--${to}">
    <div class="message__container">
      <div class="message__sender">
@@ -19,6 +20,7 @@ function appendMessage({message, sender},to){
        </div>
    </div>
  </div>`)
+  chatArea.scrollTo(0,chatArea.scrollHeight);
 }
 export default function ChatArea ({socket}){
   useEffect(()=>{

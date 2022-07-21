@@ -34,6 +34,8 @@ body {
   background-color: $background-color;
   color: $secondary-color;
   position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 img {
@@ -91,4 +93,8 @@ canvas{
     color: $secondary-color;
     background-color: $active-color;
   }
+}
+
+button {
+  cursor: pointer;
 }
