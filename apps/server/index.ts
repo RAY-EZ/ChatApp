@@ -33,7 +33,7 @@ async function start(){
       }
     })
 
-    // mongoose.set('debug', true);
+    mongoose.set('debug', true);
 
     /* connecting to redis */
     await Redis.connect();

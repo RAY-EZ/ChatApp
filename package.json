@@ -4,7 +4,8 @@
   "description": "Using Node, Socket.io, and React",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "test": "turbo run test"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,5 @@
     "@types/jest": "28.1.3",
     "jest": "28.1.2",
     "turbo": "1.2.16"
-  },
-  "dependencies": {
-    "mongoose": "6.4.0"
   }
 }

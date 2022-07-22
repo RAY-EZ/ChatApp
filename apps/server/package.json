@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "express-validator": "6.14.2",
     "jsonwebtoken": "8.5.1",
+    "mongoose": "6.4.6",
     "nanoid": "3.3.4",
     "nodemon": "^2.0.4",
     "redis": "4.1.1",
@@ -22,7 +23,9 @@
   },
   "scripts": {
     "start": "ts-node-dev index.ts",
-    "test": "jest --watch --config ./test/jest.config.ts"
+    "test": "jest --config ./test/jest.config.ts",
+    "test:watch": "jest --watch --config ./test/jest.config.ts",
+    "build": "rm -rf ./build && tsc -p ./tsconfig.build.json"
   },
   "keywords": [],
   "author": "",

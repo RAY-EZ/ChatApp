@@ -14,14 +14,28 @@ Router.get('/search', isLoggedIn, async (req: Request, res: Response, next: Next
   // return cursor to next page -- skipping and limiting ...
   // console.log(res.locals.currentUser.id)
   // console.log(req.query)
-  const groupQuery = Group.find();
+  const groupQuery = Group.find({},  {
+    name:1,
+    isProtected:1,
+    members:1,
+    created_at:1, 
+    g_id:1,
+    isMember: { 
+      $cond : { 
+        if : { 
+          $eq: [ {$indexOfArray: ["$members.user", res.locals.currentUser._id]}, -1]}, 
+          then: false, 
+          else: true
+        }
+      }
+    });
   const group = await new Query<mongoose.HydratedDocument<groupAttr>>(groupQuery,req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate()
-    .query;
-  // console.log(group)
+    .query
+    
   res.send(group)
 })
 
@@ -131,7 +145,16 @@ Router.post('/:groupid/join', isLoggedIn, async (req: Request, res: Response, ne
   }
   
   let group = await Group.findById(groupid);
-  
+  let isMemberInGroup = await Group.isMemberInGroup(group.id, currentUser.id)
+  console.log(currentUser.id, currentUser._id);
+  if(isMemberInGroup) {
+    return res.send({
+      length: 1,
+      data: [
+        group
+      ]
+    })
+  }
   let updatedGroup = group.AddMemberById(currentUser._id);
 
   await updatedGroup.save();
