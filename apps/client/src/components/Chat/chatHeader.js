@@ -9,9 +9,8 @@ export default function ChatHeader({ groupId, socket }){
   const [active, setActive] = useState(0); // redis will provide updated value
   const [groupinfo, setGroupinfo] = useState({});
   useEffect(()=>{
-    const {hostname, protocol}  = window.location;
     if(groupId){
-      const url = new URL(`${protocol}//${hostname}:5000/group/${groupId}`);
+      const url =  createURL(`api/group/${groupId}`);
       (async ()=>{
         try{
           const response = await axios.get(url.href,{
@@ -38,7 +37,7 @@ export default function ChatHeader({ groupId, socket }){
     // console.log(typeof window.createURL());
     // console.log(groupinfo.id)
     if(groupinfo.id){      
-      let requestUrl = createURL(`/group/${groupinfo.id}/active`);
+      let requestUrl = createURL(`/api/group/${groupinfo.id}/active`);
       // console.log(requestUrl);
       (async ()=>{
         try{

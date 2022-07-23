@@ -10,7 +10,7 @@ describe('group creating route', ()=>{
   it('creates a group',async ()=>{
     
     const response = await request(app)
-      .post('/group/create')
+      .post('/api/group/create')
       .send({
         name: 'testGroup',
         isProtected: false
@@ -21,14 +21,14 @@ describe('group creating route', ()=>{
   
   it('generates unique g_id for group', async ()=>{
     const group1 = await request(app)
-      .post('/group/create')
+      .post('/api/group/create')
       .send({
         name: 'testGroup',
         isProtected: false
       })
       .expect(201)
     const group2 = await request(app)
-      .post('/group/create')
+      .post('/api/group/create')
       .send({
         name: 'testGroup',
         isProtected: false
@@ -44,7 +44,7 @@ describe('group creating route', ()=>{
 describe('get group group', ()=>{
   it('get group with id', async ()=>{
     const response = await request(app)
-      .post('/group/create')
+      .post('/api/group/create')
       .send({
         name: 'testGroup',
         isProtected: false
@@ -54,7 +54,7 @@ describe('get group group', ()=>{
     let { id }= response.body.data[0];
   
     const group = await request(app)
-      .get(`/group/${id}`)
+      .get(`/api/group/${id}`)
       .expect(200)
   
     expect(group.body.data[0].id).toEqual(id);
@@ -67,7 +67,7 @@ describe('get group group', ()=>{
 describe('handling members in group', ()=>{
   it('join group as current user', async ()=>{
     let response = await request(app)
-      .post('/group/create')
+      .post('/api/group/create')
       .send({
         name: 'testGroup',
         isProtected: false
@@ -77,7 +77,7 @@ describe('handling members in group', ()=>{
     let userid = new mongoose.Types.ObjectId();
     // console.log(groupid)
     let updatedGroup = await request(app)
-    .post(`/group/${groupid}/join`)
+    .post(`/api/group/${groupid}/join`)
     .expect(200)
 
     const group = await Group.findById(groupid);
@@ -86,7 +86,7 @@ describe('handling members in group', ()=>{
   
   it('leave as a group as current user', async ()=>{
     let response = await request(app)
-    .post('/group/create')
+    .post('/api/group/create')
     .send({
       name: 'testGroup',
       isProtected: false
@@ -95,14 +95,14 @@ describe('handling members in group', ()=>{
     let groupid = response.body.data[0].id;
     let currentUserId = new mongoose.Types.ObjectId();
     await request(app)
-    .post(`/group/${groupid}/join`)
+    .post(`/api/group/${groupid}/join`)
     .send({
       currentUserId
     })
     .expect(200)
 
     await request(app)
-      .patch(`/group/${groupid}/leave`)
+      .patch(`/api/group/${groupid}/leave`)
       .send({
         currentUserId
       })

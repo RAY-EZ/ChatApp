@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { BrowserRouter as Router,Routes, Route, Link, useParams} from 'react-router-dom';
+import createURL from './utils/createUrl';
 
 import Join from './components/Join/Join';
 import Chat from './components/Chat/Chat';
@@ -13,13 +14,14 @@ const App = () =>{
   const {user} = useUserContext();
   const [Socket, setSocket] = useState(null)
   const host = window.location.hostname;
-  const EndPoint = `ws://${host}:5000`;
+  const EndPoint = createURL(`/`, 'ws:');
 
   useEffect(()=>{
     console.log('component mounted')
-    let socket= io(EndPoint,{
+    let socket= io(EndPoint.href,{
       transports: ['websocket'],
-      autoConnect: false
+      autoConnect: false,
+      path:'/ws/socket-io'
     })
     // socket.connect();
     socket.on('connect',()=>{

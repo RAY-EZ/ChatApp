@@ -1,6 +1,7 @@
 import React, {useState, createRef} from 'react';
 import { Link} from 'react-router-dom';
 import axios from 'axios';
+import createURL from '../../utils/createUrl';
 
 import './Join.css';
 import { useUserContext } from '../../db';
@@ -28,12 +29,10 @@ const Join = () => {
 
     async function handleSubmit(e){
       e.preventDefault();
-      const signupUri = '/user/signup';
-      const loginUri = '/auth/login';
-      const uri = formType === 'login' ? loginUri : signupUri;
+      const url = formType === 'login' ? createURL('/api/auth/login') : createURL('/api/user/signup');
       
       try{
-        const response = await axios.post(`http://localhost:5000${uri}`,{
+        const response = await axios.post(url.href,{
             password,
             username: name
         },{
@@ -42,9 +41,9 @@ const Join = () => {
           },
           withCredentials: true  
         })
-
+        // forcing user to download cookies
         if(formType == 'signup'){
-          window.location.href = 'http://localhost:3000/'
+          window.location.href = createURL('/')
         }
         // window.localStorage.setItem('user', response.data.user);
         setUser(response.data.user);

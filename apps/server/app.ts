@@ -27,13 +27,13 @@ app.use(cookieParser());
 
 app.use(express.json());
 
-app.get('/', (req, res)=>{
+app.get('/api/', (req, res)=>{
     res.send('server is up and running');
 })
 
-app.use('/user', UserRouter );
-app.use('/auth', AuthRouter);
-app.use('/group', GroupRouter);;
+app.use('/api/user', UserRouter );
+app.use('/api/auth', AuthRouter);
+app.use('/api/group', GroupRouter);;
 
 app.use('*', (req:Request, res: Response)=>{
   res.statusCode = 404;

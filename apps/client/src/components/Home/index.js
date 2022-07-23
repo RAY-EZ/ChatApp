@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useDbContext, useUserContext } from '../../db';
 import GroupCard from './groupCard';
 import axios from 'axios';
+import createURL from '../../utils/createUrl';
 
 import GroupList from './groupList';
 
@@ -43,8 +44,8 @@ export default function Home({ socket:Socket }){
 
   async function handleSearch(e){
     e.preventDefault();
-      const url = new URL(`http://${window.location.hostname}:5000`);
-      url.pathname = 'group/search'; 
+      const url = new createURL('/');
+      url.pathname = '/api/group/search'; 
       if(groupSearch) url.searchParams.append('name',groupSearch)
       if(tagSearch) url.searchParams.append('g_id',tagSearch.toUpperCase())
       try{
@@ -63,10 +64,11 @@ export default function Home({ socket:Socket }){
 
 
   async function handleLogout(){
-    const route = `/auth`
+    const route = `auth`
 
     try {
-      await axios.post(`${window.location.protocol}//${window.location.hostname}:5000${route}/logout`,{},{withCredentials:true});
+      const url = createURL(`/api/${route}/logout`)
+      await axios.post( url.href, {}, {withCredentials:true});
       setUser('')
       clearDb(db);
       window.location.reload();
