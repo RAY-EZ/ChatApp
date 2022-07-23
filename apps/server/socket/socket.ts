@@ -14,9 +14,10 @@ export default async (server: http.Server)=>{
     cors: {
       origin: 'http://localhost:3000',
       credentials: true,
-      allowedHeaders: ['GET','POST'],
+      allowedHeaders: ['GET','POST']
     },
     transports: ['websocket'],
+    path: '/ws/socket-io/'
   });
 
   io.serverSideEmit

@@ -54,7 +54,7 @@ export default function GroupList({ Socket, setGroupid, searchMode, searchedGrou
         let groups = await getAllGroups(db);
         // fetching from server
         if(groups.length === 0){
-          let url = createUrl('/group/');
+          let url = createUrl('api/group/');
           const response = await axios.get(url.href,{
             withCredentials: true
           })
@@ -95,7 +95,7 @@ async function handleJoin(event){
   const GroupId = Group.dataset.groupId;
   if(Group.classList.contains('group__card--flat')){
     try {
-      let url = createUrl(`/group/${GroupId}/join`);
+      let url = createUrl(`api/group/${GroupId}/join`);
       let response =await axios.post(url.href, {}, { withCredentials: true});
       console.log(response);
     } catch(e){
