@@ -14,7 +14,7 @@ function Form(){
   async function createGroup(e){
     e.preventDefault();
   console.log(groupName, isProtected)
-    const url = new createURL(`/group/create`);
+    const url = new createURL(`api/group/create`);
     try{
       if(!groupName && isProtected != undefined) return;
       const response = await axios.post(url.href,
