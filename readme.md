@@ -2,6 +2,16 @@
 
 ## Real Time Chat Application 
 
+[try live here](http://app.susheeesh.com)
+```
+username: luffy
+password: test
+
+luffy's crew
+username: zoro
+password: 1234
+```
+
 Using Node, Socket.io, and React
 
 ### Required
