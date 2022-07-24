@@ -7,7 +7,7 @@
  */
 function createURL(base, protocol){
   const Hostname = window.location.hostname;
-  const Protocol = protocol != undefined ? protocol: 'http:';
+  const Protocol = protocol != undefined ? protocol: window.location.hostname === 'localhost' ? 'http' : 'https';
   const Port = window.location.hostname === 'localhost' ? '5000' : '';
   if(base.match(/^\//)){
     base = base.slice(1);
