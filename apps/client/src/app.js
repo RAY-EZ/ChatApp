@@ -14,7 +14,8 @@ const App = () =>{
   const {user} = useUserContext();
   const [Socket, setSocket] = useState(null)
   const host = window.location.hostname;
-  const EndPoint = createURL(`/`, 'ws:');
+  const protocol =  host === 'localhost'? 'ws:' : 'wss:';
+  const EndPoint = createURL(`/`, protocol);
 
   useEffect(()=>{
     console.log('component mounted')
