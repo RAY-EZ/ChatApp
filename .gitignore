@@ -1,8 +1,4 @@
 node_modules
-.Ds_Store
-
 .turbo
 build
-key.pem
 .env
-dist
